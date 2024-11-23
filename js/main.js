@@ -43,3 +43,32 @@ window.addEventListener("scroll", function () {
   }
 
 });
+
+function initMap() {
+    // Define the location (latitude and longitude)
+    const location = { lat: 40.748817, lng: -73.985428 }; // Example: Empire State Building, NYC
+
+    // Create the map and center it on the location
+    const map = new google.maps.Map(document.getElementById('map'), {
+      zoom: 18, // Higher zoom level for 3D views
+      center: location,
+      mapTypeId: 'hybrid', // Use 'satellite' or 'hybrid' for 3D
+      tilt: 45, // Enables 3D tilt (default: 0)
+    });
+
+    // Add a marker to the location
+    const marker = new google.maps.Marker({
+      position: location,
+      map: map,
+      title: "Empire State Building", // Optional: Add a title
+    });
+
+    // Allow map rotation using right-click drag
+    map.setOptions({ rotateControl: true });
+  }
+
+  // Call initMap when the window loads
+  window.onload = initMap;
+
+  const webGLOverlayView = new google.maps.WebGLOverlayView();
+webGLOverlayView.setMap(map);

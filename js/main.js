@@ -72,3 +72,45 @@ function initMap() {
 
   const webGLOverlayView = new google.maps.WebGLOverlayView();
 webGLOverlayView.setMap(map);
+
+const axios = require('axios');
+
+// Replace these with your API key and secret
+const API_KEY = 'acc_2d99193f4c80c48';
+const API_SECRET = '1cf551ac473ac92d61f19db1029ca708';
+
+// Base64 encode the API key and secret for Basic Authentication
+const auth = Buffer.from(`${acc_2d99193f4c80c48}:${cf551ac473ac92d61f19db1029ca708}`).toString('base64');
+
+// Function to analyze an image using Imagga
+async function analyzeImage(imagePath) {
+  try {
+    // API endpoint for image tagging
+    const endpoint = 'https://api.imagga.com/v2/tags';
+
+    // Read the image as a binary file (e.g., from a local path)
+    const imageBuffer = require('fs').readFileSync(imagePath);
+
+    // Use FormData to upload the image
+    const formData = new FormData();
+    formData.append('image', imageBuffer, {
+      filename: 'image.jpg',
+    });
+
+    // Make a POST request to Imagga's API
+    const response = await axios.post(endpoint, formData, {
+      headers: {
+        Authorization: `Basic ${auth}`,
+        ...formData.getHeaders(),
+      },
+    });
+
+    // Process and return the response
+    console.log('Image Analysis:', response.data);
+  } catch (error) {
+    console.error('Error analyzing image:', error.response?.data || error.message);
+  }
+}
+
+// Call the function with your image path
+analyzeImage('new-york-statue-of-liberty.png');

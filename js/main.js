@@ -44,73 +44,77 @@ window.addEventListener("scroll", function () {
 
 });
 
+ //Google Maps API
 function initMap() {
-    // Define the location (latitude and longitude)
-    const location = { lat: 40.748817, lng: -73.985428 }; // Example: Empire State Building, NYC
+    const location = { lat: 40.748817, lng: -73.985428 };
 
-    // Create the map and center it on the location
     const map = new google.maps.Map(document.getElementById('map'), {
-      zoom: 18, // Higher zoom level for 3D views
+      zoom: 18,
       center: location,
-      mapTypeId: 'hybrid', // Use 'satellite' or 'hybrid' for 3D
-      tilt: 45, // Enables 3D tilt (default: 0)
+      mapTypeId: 'hybrid',
+      tilt: 45,
     });
 
-    // Add a marker to the location
     const marker = new google.maps.Marker({
       position: location,
       map: map,
-      title: "Empire State Building", // Optional: Add a title
+      title: "Empire State Building",
     });
 
-    // Allow map rotation using right-click drag
     map.setOptions({ rotateControl: true });
   }
 
-  // Call initMap when the window loads
   window.onload = initMap;
 
   const webGLOverlayView = new google.maps.WebGLOverlayView();
 webGLOverlayView.setMap(map);
 
-const axios = require('axios');
 
-// Replace these with your API key and secret
-const API_KEY = 'acc_2d99193f4c80c48';
-const API_SECRET = '1cf551ac473ac92d61f19db1029ca708';
+// Image API
+const SearchForm = document.getElementById("search-form");
+const SearchBox = document.getElementById("search-box");
+const SearchResult = document.getElementById("search-result");
+const ShowMoreBtn = document.getElementById("show-more-btn");
+const accessKey = "U3uSGZihDLmmcb7gFBzGKMKELoKjX9egH_wR8mvUtug";
 
-// Base64 encode the API key and secret for Basic Authentication
-const auth = Buffer.from(`${acc_2d99193f4c80c48}:${cf551ac473ac92d61f19db1029ca708}`).toString('base64');
+let keyword = "";
+let page = 1;
 
-// Function to analyze an image using Imagga
-async function analyzeImage(imagePath) {
-  try {
-    // API endpoint for image tagging
-    const endpoint = 'https://api.imagga.com/v2/tags';
+async function searchImages(){
+  keyword = SearchBox.value;
+  const url =`https://api.unsplash.com/search/photos?page=${page}&query=${keyword}&client_id=${accessKey}&per_page=12`;
 
-    // Read the image as a binary file (e.g., from a local path)
-    const imageBuffer = require('fs').readFileSync(imagePath);
+  const response = await fetch(url);
+  const data = await response.json();
 
-    // Use FormData to upload the image
-    const formData = new FormData();
-    formData.append('image', imageBuffer, {
-      filename: 'image.jpg',
-    });
+  console.log(data)
 
-    // Make a POST request to Imagga's API
-    const response = await axios.post(endpoint, formData, {
-      headers: {
-        Authorization: `Basic ${auth}`,
-        ...formData.getHeaders(),
-      },
-    });
+  
 
-    // Process and return the response
-    console.log('Image Analysis:', response.data);
-  } catch (error) {
-    console.error('Error analyzing image:', error.response?.data || error.message);
-  }
+SearchForm.addEventListener("submit", (e) => {
+  e.preventDefault();
+  page = 1;
+  searchImages();
+})
+
+if(page === 1){
+  SearchResult.innerHTML = "";
 }
 
-// Call the function with your image path
-analyzeImage('new-york-statue-of-liberty.png');
+results.map((result) => {
+  const image = document.createElement("img");
+  image.src = result.urls.regular;
+  const imageLink = document.createElement("a");
+  imageLink.href = result.links.html;
+  imageLink.target = "_blank";
+
+  imageLink.appendChild(image);
+  SearchResult.appendChild(imageLink);
+})
+ShowMoreBtn.style.display = "block";
+}
+
+ShowMoreBtn.addEventListener("click", ()=>{
+  page++;
+  searchImages();
+})
